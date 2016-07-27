@@ -96,9 +96,12 @@
     <icon src="www/res/icon/windows/Wide310x150Logo.scale-240.png" platform="windows" width="744" height="360"/>
     <splash src="www/res/screen/windows/SplashScreenPhone.scale-240.png" platform="windows" width="1152" height="1920"/>
   </platform>
-  <config-file target="AndroidManifest.xml" parent="/*">
-    <uses-permission android:name="android.permission.READ_CONTACTS" />
-</config-file>
+  <preference name="AndroidPersistentFileLocation" value="Internal" />
+
+<preference name="AndroidPersistentFileLocation" value="Compatibility" />
+<preference name="iosPersistentFileLocation" value="Library" />
+
+<preference name="iosPersistentFileLocation" value="Compatibility" />
   <access origin="*"/>
   <allow-intent href="http://*/*"/>
   <allow-intent href="https://*/*"/>
