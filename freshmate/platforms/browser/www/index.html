@@ -56,51 +56,68 @@
     <script type="text/javascript" src="js/index.js"></script>
     <script type="text/javascript">
         app.initialize();
-        document.addEventListener("deviceready", init, false);
-
-//The directory to store data
-var store;
-
-//Used for status updates
-var $status;
-
-//URL of our asset
-var assetURL = "https://raw.githubusercontent.com/cfjedimaster/Cordova-Examples/master/readme.md";
-
-//File name of our important data file we didn't ship with the app
-var fileName = "video.mp4";
-
-function init() {
-    
-    $status = document.querySelector("#status");
-
-    $status.innerHTML = "Checking for data file.";
-
-    store = cordova.file.dataDirectory;
-
-    //Check for the file. 
-    window.resolveLocalFileSystemURL(store + fileName, appStart, downloadAsset);
-
-}
-
-function downloadAsset() {
-    var fileTransfer = new FileTransfer();
-    console.log("About to start transfer");
-    fileTransfer.download(assetURL, store + fileName, 
-        function(entry) {
-            console.log("Success!");
-            appStart();
-        }, 
-        function(err) {
-            console.log("Error");
-            console.dir(err);
-        });
-}
-
-//I'm only called when the file exists or has been downloaded.
-function appStart() {
-    $status.innerHTML = "App ready!";
-}
+            document.addEventListener('deviceready', onDeviceReady, false);
+            
+            function downloadFile() {
+                console.log('downloadFile');
+                window.requestFileSystem(
+                    LocalFileSystem.PERSISTENT,
+                    0,
+                    onRequestFileSystemSuccess,
+                    fail
+                );
+            }
+            
+            function onRequestFileSystemSuccess(fileSystem) {
+                console.log('onRequestFileSystemSuccess');
+                fileSystem.root.getFile(
+                    'dummy.html',
+                    {create: true, exclusive: false},
+                    onGetFileSuccess,
+                    fail
+                );
+            }
+            
+            function onGetFileSuccess(fileEntry) {
+                console.log('onGetFileSuccess!');
+                var path = fileEntry.toURL().replace('dummy.html', '');
+                var fileTransfer = new FileTransfer();
+                fileEntry.remove();
+                
+                fileTransfer.download(
+                    'http://www.w3.org/2011/web-apps-ws/papers/Nitobi.pdf',
+                    path + 'theFile.pdf',
+                    function(file) {
+                        console.log('download complete: ' + file.toURI());
+                        showLink(file.toURI());
+                    },
+                    function(error) {
+                        console.log('download error source ' + error.source);
+                        console.log('download error target ' + error.target);
+                        console.log('upload error code: ' + error.code);
+                    }
+                );
+            }
+            
+            function showLink(url) {
+                alert(url);
+                var divEl = document.getElementById('deviceready');
+                var aElem = document.createElement('a');
+                aElem.setAttribute('target', '_blank');
+                aElem.setAttribute('href', url);
+                aElem.appendChild(document.createTextNode('Ready! Click To Open.'))
+                divEl.appendChild(aElem);
+            }
+            
+            function fail(evt) {
+                console.log(evt.target.error.code);
+            }
+            
+            /* When this function is called, PhoneGap has been initialized and is ready to roll */
+            function onDeviceReady() {
+                console.log('device ready!');
+                downloadFile();
+            }
     </script>
 </body>
 
